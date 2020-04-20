@@ -28,11 +28,6 @@ class Environment:
 
 	def get_state(self):
 		# returns the current state, represented as an int
-	    # from 0... NUM_STATES-1
-	    # NUM_STATES = 3^(NUM_ROWS*NUM_COLS), since each cell can have 3 possible values - empty, x, o
-	    # some states are not possible, e.g. all cells are x, but we ignore that detail
-	    # this is like finding the integer represented by a base-3 number
-
 		cell = 0
 		state = 0
 
@@ -157,8 +152,8 @@ class Environment:
 			print()
 
 class Agent:
-	def __init__(self, sym = 1, eps=0.1, alpha=0.5, states_results=None):
-		self.eps = eps # probability of choosing random action instead of greedy
+	def __init__(self, sym = 1, eps=0.1, alpha=0.8, states_results=None):
+		self.eps = eps # probability of choosing random action
 		self.alpha = alpha # learning rate
 		self.state_history = []
 		self.sym = sym
@@ -178,12 +173,12 @@ class Agent:
 			if ended:
 				if winner == self.sym:
 					val = 1
-				# elif winner is None:
-				# 	val = 0.5
+				elif winner is None:
+					val = 0.5
 				else:
-					val = 0
+					val = -1
 			else:
-				val = 0.5
+				val = 0
 
 			self.value_fun[state] = val
 
@@ -200,10 +195,10 @@ class Agent:
 			return
 
 		reward = env.reward(self.sym)
-		target = reward
+		value = reward
 		for prev in reversed(self.state_history):
-			self.value_fun[prev] += self.alpha*(target - self.value_fun[prev])
-			target = self.value_fun[prev]
+			self.value_fun[prev] += self.alpha*(value - self.value_fun[prev])
+			value = self.value_fun[prev]
 		self.reset_history()
 
 	def reset_history(self):
@@ -307,9 +302,6 @@ class Default_Player:
 def get_initial_states_results(env, i=0, j=0):
 	# recursive function that will return all
 	# possible states (as ints) and who the corresponding winner is for those states (if any)
-	# (i, j) refers to the next cell on the board to permute (we need to try -1, 0, 1)
-	# impossible games are ignored, i.e. 3x's and 3o's in a row simultaneously
-	# since that will never happen in a real game
 	
 	results = [] # results as an array of state_winner_triples
 
@@ -359,6 +351,9 @@ if __name__ == '__main__':
 
 	print('Training Complete')
 	print()
+
+	a1.set_eps(0)
+	a2.set_eps(0)
 
 	print('Begining validation of the agent trained by pairing it to an agent with a random approach...')
 	print()
