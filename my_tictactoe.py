@@ -256,6 +256,28 @@ class Agent:
 		if action is not None:
 			env.board[action[0],action[1]] = self.sym
 
+class Random_Action_Player:
+	def __init__(self,sym):
+		self.sym = sym
+
+	def take_action(self, env):
+		# get all possible valid actions
+		valid_actions = []
+		for i in range(NUM_ROWS):
+			for j in range(NUM_COLS):
+				if env.is_empty(i,j): # If cell is empty then it is a valid action
+					valid_actions.append((i,j))
+
+		idx = np.random.choice(len(valid_actions))
+		action = valid_actions[idx]
+		env.board[action[0],action[1]] = self.sym
+
+	def update_value_function(self, env):
+		pass
+
+	def update_state_history(self, state):
+		pass
+
 class Default_Player:
 	def __init__(self,sym):
 		self.sym = sym
@@ -324,9 +346,9 @@ if __name__ == '__main__':
 
 	print('Training Agent...')
 	print()
-	T = 10000 # number of games that will be played for training
+	T = 50000 # number of games that will be played for training
 	for t in range(T):
-		if t%200==0:
+		if t%800==0:
 			print('Training: {}% Complete'.format(t*100/T))
 		
 		if t < 1000: # min eps=0.01
@@ -338,15 +360,39 @@ if __name__ == '__main__':
 	print('Training Complete')
 	print()
 
-	print('Begining game against human player. Human is "X", angent is "O":')
+	print('Begining validation of the agent trained by pairing it to an agent with a random approach...')
 	print()
 
-	human = Default_Player(e.o)
+	rand_p = Random_Action_Player(e.o)
 
-	while True:
-		Environment(print_board=True).play_game(a1,human)
-		print()
-		answer = input("Play again? [y/n]: ")
-		if answer and answer.lower()[0] == 'n':
-			break
+	G = 1000 # Number of games played for validation
+	agent_wins = 0
+	rand_player_wins = 0
+	draws = 0
+	for g in range(G):
+		val_env = Environment()
+		val_env.play_game(a1,rand_p)
+
+		if val_env.winner == a1.sym:
+			agent_wins += 1
+		elif val_env.winner == rand_p.sym:
+			rand_player_wins += 1
+		else:
+			draws += 1
+
+	print('Validation results:')
+	print('Trained Agent Wins: {}%;     Random Action Player Wins: {}%;      Draws:{}%'.format(agent_wins*100/G,rand_player_wins*100/G,draws*100/G))
+
+	# print('Begining game against human player. Human is "X", angent is "O":')
+	# print()
+
+	# human = Default_Player(e.o)
+
+	# while True:
+	# 	Environment(print_board=True).play_game(a1,human)
+	# 	print()
+	# 	answer = input("Play again? [y/n]: ")
+	# 	if answer and answer.lower()[0] == 'n':
+	# 		break
+
 
