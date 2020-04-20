@@ -49,12 +49,35 @@ The value function used in this algorithm can be given by:
 
 	V(s) = V(s) + alpha*(V(s')-V(s)) 
 
-where `V(s)` is the value function of the state `s`, `s'` is the next state and `alpha` is the learning rate of the algorithm.
+where `V(s)` is the value function of the state `s`, `s'` is the next state and `alpha` is the discount factor, and it represents the importance of future rewards over current rewards.
+
+### Training the Agent
+After initializing the value function, we must train the agent. The training occurs trough thousands of iterations or episodes, each of which corresponds to a game of Tic-Tac-Toe. For each episode, the agent will update its value function according to the result of the game and the reward received. After thousands of iterations, the value function should approximate the probability of victory, or the average reward of a given action.
+
+Finally, we will use a decreasing epsilon-greedy approach to the training. This means that there will be assigned a value `epsilon` between 0 and 1 to the agent. This value corresponds to the probability of the agent to take a random action instead of an action based on the current value function. Taking a random action helps the algorithm escape possible local maximums and find an overall better result. The value of `epsilon = 1/t` where `t` is the total number of games played so far. The minimum value for epsilon is `epsilon_min = 0.01`.
+
+## Results
+
+The agent was trained over 50000 episodes with a decreasing epsilon-greedy strategy. After the training, to validate the results the agent played 1000 games against another agent programmed to always take random actions. The results are shown in the table below.
+
+| Trained Agent Wins | Draws | Random Action Player Wins | 
+| ----------- | ----------- | ----------- |
+| 60.2% - 67.2% | 9.8% - 14.8% | 23% - 28.2% |
+
+As we can see, the trained agent was able the obtain much better results than a random approach, always winning over `60%` of the games. 
+
+It is interesting to note that if we change `alpha` to a lower value such as 0.5 we get slightly worse results. These results, although still superior to a random approach, range from `50%` to `62%` of number of victories for the trained agent. This happens due to the difference of weight given to future rewards in contrast to current rewards, as discussed in the previous section.
 
 ## Conclusions
 
-It is important to note that, in many cases, computing every single state and what the agent should do for each one is ludicrous. For a simple game like Tic-Tac-Toe, there are a total of <img src = "https://render.githubusercontent.com/render/math?math=possible\_values\_for\_each\_cell^{(num\_rows\cdot num\_cols)}=3^9=19,683"> states. If you increase the number of rows of columns the number of states increases exponentially. A 4x4 game would imply in over 43 million different states. In this exercise, we initialized the value function with a default value for each possible state. However for any game that is slightly more complex than a 3x3 Tic-Tac-Toe, this approach would be computationally inviable. Therefore, an algorithm that can help the agent learn and develop a strategy to play the game without the need to map every possible state would be necessary in such cases.
+ In many cases, computing every single state and what the agent should do for each one is ludicrous. For a simple game like Tic-Tac-Toe, there are a total of <img src = "https://render.githubusercontent.com/render/math?math=possible\_values\_for\_each\_cell^{(num\_rows\cdot num\_cols)}=3^9=19,683"> states. If you increase the number of rows of columns the number of states increases exponentially. A 4x4 game would imply in over 43 million different states. In this exercise, we initialized the value function with a default value for each possible state. However for any game that is slightly more complex than a 3x3 Tic-Tac-Toe, this approach would be computationally inviable. Therefore, an algorithm that can help the agent learn and develop a strategy to play the game without the need to map every possible state would be necessary in such cases.
+
+ With that being said, the results obtained were what was expected. Adjusting the value of `epsilon` or `alpha` may result in slightly better results but they were overall very satisfactory. A different algorithm such as the Alpha-Beta-Pruning[[1]](#minmaxABP) may obtain an much better solution. However, the Alpha-Beta-Pruning may have trouble computing a solution as the complexity of the game increases, since its approach consists on analyzing every relevant state.
 
 ## References
 <a id="minmaxABP">[1]</a> 
 [Minimax with Alpha-Beta Pruning in Python](https://stackabuse.com/minimax-and-alpha-beta-pruning-in-python/)
+
+# Authors
+
+* **Arthur de Senna Rocha** - [asrocha95](https://github.com/asrocha95)
